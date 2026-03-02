@@ -66,6 +66,13 @@ button {
   padding: 0.5rem 0 1rem;
 }
 
+.header-top {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
 .header h1 {
   margin: 0;
   font-size: 1.95rem;
@@ -77,6 +84,61 @@ button {
   margin: 0.35rem 0 0;
   color: var(--muted);
   max-width: 38rem;
+}
+
+.support-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.42rem 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-strong);
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+.support-link:hover,
+.support-link:focus-visible {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-focus);
+}
+
+.coffee-icon {
+  position: relative;
+  width: 0.8rem;
+  height: 0.62rem;
+  border: 1.5px solid currentColor;
+  border-radius: 0 0 0.2rem 0.2rem;
+  border-top: 0;
+  flex: 0 0 auto;
+}
+
+.coffee-icon::before {
+  content: '';
+  position: absolute;
+  top: 0.08rem;
+  right: -0.22rem;
+  width: 0.22rem;
+  height: 0.26rem;
+  border: 1.5px solid currentColor;
+  border-left: 0;
+  border-radius: 0 0.18rem 0.18rem 0;
+}
+
+.coffee-icon::after {
+  content: '';
+  position: absolute;
+  left: 0.13rem;
+  top: -0.34rem;
+  width: 0.12rem;
+  height: 0.18rem;
+  border-left: 1.5px solid currentColor;
+  box-shadow: 0.22rem 0 0 0 currentColor;
+  opacity: 0.7;
 }
 
 .section {
@@ -602,6 +664,12 @@ button {
 @media (min-width: 700px) {
   .app {
     padding-top: 1.75rem;
+  }
+
+  .header-top {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .controls {

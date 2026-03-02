@@ -363,7 +363,18 @@ function App() {
   return (
     <main className="app">
       <header className="header">
-        <h1>Pizza Dough Calculator</h1>
+        <div className="header-top">
+          <h1>Pizza Dough Calculator</h1>
+          <a
+            className="support-link"
+            href="https://buymeacoffee.com/andrewmaledy"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <span className="coffee-icon" aria-hidden="true" />
+            <span>Buy me a coffee</span>
+          </a>
+        </div>
         <p>Fast, mobile-friendly dough math for Neapolitan and New York styles.</p>
       </header>
 
