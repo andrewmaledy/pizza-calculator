@@ -24,6 +24,10 @@ const OVEN_TEMP_OPTIONS = [450, 500, 700, 900];
 const DEFAULT_OVEN_TEMP = 500;
 const DEFAULT_ROOM_TEMP = 70;
 const DEFAULT_PREFERMENT_TYPE = 'standard';
+const SEO_TITLE = 'Pizza Dough Calculator | Neapolitan & New York Recipes';
+const SEO_DESCRIPTION =
+  'Calculate pizza dough ingredient weights, fermentation timelines, and poolish recipes for Neapolitan and New York pizza styles.';
+const SEO_SITE_NAME = 'Pizza Dough Calculator';
 
 function formatGrams(value, decimals = 1) {
   return `${Number(value).toFixed(decimals)} g`;
@@ -94,6 +98,44 @@ function buildMainMix(calculation, recipe, prefermentMix) {
       { label: 'Sugar', value: calculation.ingredientWeights.sugar, percent: null, decimals: 1 },
     ].filter((item) => item.value > 0),
   };
+}
+
+function upsertMeta(selector, attributes) {
+  let element = document.head.querySelector(selector);
+
+  if (!element) {
+    element = document.createElement('meta');
+    document.head.appendChild(element);
+  }
+
+  Object.entries(attributes).forEach(([key, value]) => {
+    element.setAttribute(key, value);
+  });
+}
+
+function upsertCanonical(href) {
+  let element = document.head.querySelector('link[rel="canonical"]');
+
+  if (!element) {
+    element = document.createElement('link');
+    element.setAttribute('rel', 'canonical');
+    document.head.appendChild(element);
+  }
+
+  element.setAttribute('href', href);
+}
+
+function upsertJsonLd(payload) {
+  let element = document.head.querySelector('#seo-json-ld');
+
+  if (!element) {
+    element = document.createElement('script');
+    element.id = 'seo-json-ld';
+    element.type = 'application/ld+json';
+    document.head.appendChild(element);
+  }
+
+  element.textContent = JSON.stringify(payload);
 }
 
 function parseInitialState() {
@@ -359,6 +401,66 @@ function App() {
     sizeValue,
     styleId,
   ]);
+
+  useEffect(() => {
+    const canonicalUrl = `${window.location.origin}${window.location.pathname}`;
+
+    document.title = SEO_TITLE;
+    upsertCanonical(canonicalUrl);
+    upsertMeta('meta[name="description"]', {
+      name: 'description',
+      content: SEO_DESCRIPTION,
+    });
+    upsertMeta('meta[property="og:title"]', {
+      property: 'og:title',
+      content: SEO_TITLE,
+    });
+    upsertMeta('meta[property="og:description"]', {
+      property: 'og:description',
+      content: SEO_DESCRIPTION,
+    });
+    upsertMeta('meta[property="og:url"]', {
+      property: 'og:url',
+      content: canonicalUrl,
+    });
+    upsertMeta('meta[property="og:site_name"]', {
+      property: 'og:site_name',
+      content: SEO_SITE_NAME,
+    });
+    upsertMeta('meta[name="twitter:title"]', {
+      name: 'twitter:title',
+      content: SEO_TITLE,
+    });
+    upsertMeta('meta[name="twitter:description"]', {
+      name: 'twitter:description',
+      content: SEO_DESCRIPTION,
+    });
+
+    upsertJsonLd({
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'WebSite',
+          name: SEO_SITE_NAME,
+          url: canonicalUrl,
+          description: SEO_DESCRIPTION,
+        },
+        {
+          '@type': 'SoftwareApplication',
+          name: SEO_SITE_NAME,
+          applicationCategory: 'UtilityApplication',
+          operatingSystem: 'Web',
+          url: canonicalUrl,
+          description: SEO_DESCRIPTION,
+          offers: {
+            '@type': 'Offer',
+            price: '0',
+            priceCurrency: 'USD',
+          },
+        },
+      ],
+    });
+  }, []);
 
   return (
     <main className="app">
