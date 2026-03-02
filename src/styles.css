@@ -221,15 +221,6 @@ button {
   padding-left: 1rem;
 }
 
-.instruction-list {
-  margin: 0;
-  padding-left: 1.2rem;
-}
-
-.instruction-list li + li {
-  margin-top: 0.6rem;
-}
-
 .warning-list li + li {
   margin-top: 0.5rem;
 }
@@ -250,8 +241,115 @@ button {
   font-size: 0.85rem;
 }
 
-.instruction-list li {
+.timeline {
+  position: relative;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 0.2rem;
+  bottom: 0.2rem;
+  left: 0.43rem;
+  width: 2px;
+  background: linear-gradient(180deg, var(--accent-soft), var(--line));
+}
+
+.timeline-phase {
+  margin: 0.35rem 0 0.1rem 1.7rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.timeline-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.8rem;
+  align-items: start;
+}
+
+.timeline-marker {
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 999px;
+  background: var(--accent);
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px var(--accent-soft);
+  margin-top: 0.25rem;
+  position: relative;
+  z-index: 1;
+}
+
+.timeline-card {
+  background: var(--surface-strong);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0.8rem 0.9rem;
+}
+
+.timeline-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.3rem;
+}
+
+.timeline-heading strong {
+  font-size: 1rem;
+}
+
+.timeline-card p {
+  margin: 0;
   line-height: 1.55;
+  color: var(--muted);
+}
+
+.timeline-item.delay .timeline-marker {
+  background: #fff;
+  border-color: var(--accent);
+}
+
+.timeline-item.delay .timeline-card {
+  background: var(--accent-wash);
+  border-style: dashed;
+}
+
+.timeline-item.check .timeline-marker {
+  background: #fff7db;
+  border-color: #c79a1b;
+  box-shadow: 0 0 0 1px rgba(199, 154, 27, 0.18);
+}
+
+.timeline-item.check .timeline-card {
+  background: #fffdf4;
+}
+
+.timeline-item.note .timeline-marker {
+  background: #fff;
+  border-color: var(--line-strong);
+}
+
+.timeline-item.note .timeline-card {
+  background: #f8f4ee;
+}
+
+.timeline-chip {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 700;
 }
 
 @media (min-width: 700px) {

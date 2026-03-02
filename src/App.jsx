@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { calculateRecipe, getBallWeight, getOvenAdjustment } from './calculations';
-import { doughSizes, ovenAdjustments, recipes } from './recipeData';
+import { appConfig, doughSizes, ovenAdjustments, recipes } from './recipeData';
 
 const recipeList = Object.values(recipes);
 const DEFAULT_STYLE_ID = 'neapolitan';
@@ -13,6 +13,29 @@ const DEFAULT_OVEN_TEMP = 500;
 
 function formatGrams(value, decimals = 1) {
   return `${Number(value).toFixed(decimals)} g`;
+}
+
+function formatDuration(duration, unit) {
+  if (!duration || !unit) {
+    return null;
+  }
+
+  const label = duration === 1 ? unit.replace(/s$/, '') : unit;
+  return `${duration} ${label}`;
+}
+
+function getWaterTempLabel(timeline) {
+  const firstDetail = timeline
+    .flatMap((phase) => phase.steps)
+    .find((step) => step.detail?.toLowerCase().includes('water'))
+    ?.detail;
+
+  if (!firstDetail) {
+    return 'Follow selected recipe';
+  }
+
+  const match = firstDetail.match(/\(([^)]+)\)/);
+  return match ? match[1] : firstDetail;
 }
 
 function parseInitialState() {
@@ -53,6 +76,7 @@ function App() {
   const fermentation =
     fermentationOptions.find((option) => option.value === fermentationValue) ||
     fermentationOptions[0];
+  const waterTempLabel = getWaterTempLabel(fermentation.timeline);
   const sizeOption =
     doughSizes.find((option) => option.value === sizeValue) || doughSizes[1];
 
@@ -60,12 +84,14 @@ function App() {
   const ovenAdjustment = getOvenAdjustment(ovenTemp, ovenAdjustments);
   const ovenTempIndex = OVEN_TEMP_OPTIONS.indexOf(Number(ovenTemp));
   const hydrationPercent = recipe.ingredients.water + (ovenAdjustment?.hydrationMod || 0);
+  const targetDoughWeight =
+    (Number(pizzaCount) || 0) * ballWeight * (appConfig?.wasteFactor || 1);
   const calculation = calculateRecipe(
     recipe,
     fermentation,
     'idy',
-    Number(pizzaCount) || 0,
-    ballWeight,
+    1,
+    targetDoughWeight,
     hydrationPercent,
   );
 
@@ -109,7 +135,7 @@ function App() {
   ].filter((row) => row.percent > 0);
 
   const warnings = [];
-  if (styleId === 'neapolitan' && fermentation.durationHours > 48) {
+  if (styleId === 'neapolitan' && fermentation.value === '72h-cf') {
     warnings.push(
       'Long fermentation without sugar may result in a pale crust in home ovens. Consider switching to NY Style or adding 1% sugar.',
     );
@@ -120,11 +146,6 @@ function App() {
       'Yeast is rounded to 0.01g. For tiny long-ferment doses, use a jeweler’s scale or approximate with a small pinch.',
     );
   }
-
-  if (fermentation.note) {
-    warnings.push(fermentation.note);
-  }
-
   if (ovenAdjustment?.forceSugar && recipe.ingredients.sugar === 0) {
     warnings.push(
       'Your oven temperature is in a lower home-oven range. Sugar-free dough may brown poorly, so consider adding 1% sugar or switching to New York style.',
@@ -143,10 +164,54 @@ function App() {
     setFermentationValue(nextRecipe.fermentationOptions[0].value);
   };
 
-  const basicInstructions = [...(fermentation.steps || [])];
+  const timelineItems = fermentation.timeline.flatMap((phase, phaseIndex) => {
+    const phaseHeader = {
+      id: `phase-${phaseIndex}`,
+      kind: 'phase',
+      phase: phase.phase,
+    };
+
+    const steps = phase.steps.flatMap((step, stepIndex) => {
+      const detailParts = [];
+
+      if (step.detail) {
+        detailParts.push(step.detail);
+      }
+
+      if (step.temp) {
+        detailParts.push(`Temp: ${step.temp}.`);
+      }
+
+      if (step.target) {
+        detailParts.push(`Target: ${step.target}.`);
+      }
+
+      const durationLabel = formatDuration(step.duration, step.unit);
+
+      return [
+        {
+          id: `phase-${phaseIndex}-step-${stepIndex}`,
+          kind: 'step',
+          stepType: step.type,
+          label: step.label,
+          detail: detailParts.join(' '),
+          durationLabel,
+        },
+      ];
+    });
+
+    return [phaseHeader, ...steps];
+  });
 
   if (ovenAdjustment?.proTip) {
-    basicInstructions.push(`Oven note: ${ovenAdjustment.proTip}`);
+    timelineItems.push({
+      id: 'oven-note',
+      kind: 'note',
+      stepType: 'note',
+      label: 'Oven Note',
+      detail: ovenAdjustment.proTip,
+      durationLabel: null,
+    });
   }
 
   useEffect(() => {
@@ -287,7 +352,7 @@ function App() {
           </div>
           <div className="summary-row">
             <span>Water Temp</span>
-            <strong>{fermentation.targetWaterTemp || 'Use recipe default'}</strong>
+            <strong>{waterTempLabel}</strong>
           </div>
           <div className="summary-row">
             <span>Ball Weight</span>
@@ -325,16 +390,35 @@ function App() {
 
       <section className="section">
         <h2>Basic Instructions</h2>
-        {fermentation.targetWaterTemp ? (
-          <p className="summary-note">
-            Water temperature target: {fermentation.targetWaterTemp}.
-          </p>
-        ) : null}
-        <ol className="instruction-list">
-          {basicInstructions.map((step) => (
-            <li key={step}>{step}</li>
-          ))}
-        </ol>
+        <div className="timeline">
+          {timelineItems.map((item) => {
+            if (item.kind === 'phase') {
+              return (
+                <div key={item.id} className="timeline-phase">
+                  {item.phase}
+                </div>
+              );
+            }
+
+            return (
+              <div
+                key={item.id}
+                className={`timeline-item ${item.stepType === 'wait' || item.stepType === 'ferment' ? 'delay' : ''} ${item.stepType === 'check' ? 'check' : ''} ${item.stepType === 'note' ? 'note' : ''}`}
+              >
+                <div className="timeline-marker" />
+                <div className="timeline-card">
+                  <div className="timeline-heading">
+                    <strong>{item.label}</strong>
+                    {item.durationLabel ? (
+                      <span className="timeline-chip">{item.durationLabel}</span>
+                    ) : null}
+                  </div>
+                  {item.detail ? <p>{item.detail}</p> : null}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </section>
 
       {warnings.length > 0 ? (
