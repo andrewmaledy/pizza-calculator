@@ -404,7 +404,22 @@ function App() {
               </label>
 
               <label className="toggle-field">
-                <span className="field-label">Preferment</span>
+                <span className="field-label field-label-inline">
+                  Preferment
+                  <span className="tooltip">
+                    <button
+                      type="button"
+                      className="tooltip-trigger"
+                      aria-label="What does preferment do?"
+                    >
+                      ?
+                    </button>
+                    <span className="tooltip-content" role="tooltip">
+                      A preferment is a small starter mixed ahead of time. It improves flavor,
+                      extensibility, and fermentation strength before the main dough is mixed.
+                    </span>
+                  </span>
+                </span>
                 <button
                   type="button"
                   className={`switch ${prefermentEnabled ? 'on' : ''}`}
@@ -443,14 +458,44 @@ function App() {
           </div>
 
           <div className="control-group">
-            <h3>Temperature</h3>
+            <h3 className="field-label-inline">
+              Temperature
+              <span className="tooltip">
+                <button
+                  type="button"
+                  className="tooltip-trigger"
+                  aria-label="How temperature affects the calculator"
+                >
+                  ?
+                </button>
+                <span className="tooltip-content tooltip-content-wide" role="tooltip">
+                  Temperature changes more than the instructions. Room temp adjusts yeast for
+                  room-temp ferments, and oven temp adjusts hydration guidance plus some browning
+                  warnings.
+                </span>
+              </span>
+            </h3>
             <div className="controls">
               <label className={fermentation.environment !== 'Room temp' ? 'field-disabled' : ''}>
-                <span className="field-label">
+                <span className="field-label field-label-inline">
                   Room Temp (F): {roomTemp}
                   {fermentation.environment !== 'Room temp'
                     ? ' (disabled for cold ferment)'
                     : ''}
+                  <span className="tooltip">
+                    <button
+                      type="button"
+                      className="tooltip-trigger"
+                      aria-label="How room temperature is used"
+                    >
+                      ?
+                    </button>
+                    <span className="tooltip-content tooltip-content-wide" role="tooltip">
+                      Room temperature is only used for room-temp fermentation schedules. It scales
+                      the yeast amount up or down from the 70F baseline and also changes the water
+                      temperature guidance.
+                    </span>
+                  </span>
                 </span>
                 <input
                   type="range"
@@ -467,7 +512,23 @@ function App() {
               </label>
 
               <label>
-                <span className="field-label">Oven Temp (F): {ovenTemp}</span>
+                <span className="field-label field-label-inline">
+                  Oven Temp (F): {ovenTemp}
+                  <span className="tooltip">
+                    <button
+                      type="button"
+                      className="tooltip-trigger"
+                      aria-label="How oven temperature is used"
+                    >
+                      ?
+                    </button>
+                    <span className="tooltip-content tooltip-content-wide" role="tooltip">
+                      Oven temperature changes the target hydration band and can trigger sugar or
+                      browning guidance. Lower-temp home ovens push the dough wetter, while hotter
+                      ovens push it leaner.
+                    </span>
+                  </span>
+                </span>
                 <input
                   type="range"
                   min="0"
@@ -610,7 +671,25 @@ function App() {
                 <div className="timeline-marker" />
                 <div className="timeline-card">
                   <div className="timeline-heading">
-                    <strong>{item.label}</strong>
+                    <strong className={item.label === 'Windowpane Test' ? 'timeline-label-inline' : ''}>
+                      {item.label}
+                      {item.label === 'Windowpane Test' ? (
+                        <span className="tooltip">
+                          <button
+                            type="button"
+                            className="tooltip-trigger"
+                            aria-label="What to do if the windowpane test fails"
+                          >
+                            ?
+                          </button>
+                          <span className="tooltip-content tooltip-content-wide" role="tooltip">
+                            If the dough tears instead of stretching thin, keep kneading for 2 to
+                            3 more minutes, rest it briefly, and test again. The dough should look
+                            smoother and stretch more easily on the next check.
+                          </span>
+                        </span>
+                      ) : null}
+                    </strong>
                     {item.durationLabel ? (
                       <span className="timeline-chip">{item.durationLabel}</span>
                     ) : null}

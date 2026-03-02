@@ -169,8 +169,77 @@ button {
   color: var(--ink);
 }
 
+.field-label-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
 .field-disabled .field-label {
   color: var(--muted);
+}
+
+.tooltip {
+  position: relative;
+  display: inline-flex;
+  text-transform: none;
+}
+
+.tooltip-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.2rem;
+  height: 1.2rem;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface-strong);
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: none;
+}
+
+.tooltip-trigger:hover,
+.tooltip-trigger:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: var(--shadow-focus);
+}
+
+.tooltip-content {
+  position: absolute;
+  top: calc(100% + 0.45rem);
+  left: 0;
+  z-index: 10;
+  width: min(16rem, 70vw);
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-strong);
+  color: var(--ink);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  text-transform: none;
+  box-shadow: var(--shadow-soft);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(4px);
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+}
+
+.tooltip-content-wide {
+  width: min(19rem, 78vw);
+}
+
+.tooltip:hover .tooltip-content,
+.tooltip:focus-within .tooltip-content {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .control-help {
@@ -475,6 +544,12 @@ button {
 
 .timeline-heading strong {
   font-size: 1rem;
+}
+
+.timeline-label-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 .timeline-card p {
