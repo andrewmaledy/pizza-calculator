@@ -16,6 +16,7 @@ This README provides comprehensive, step-by-step instructions for every fermenta
 * **Bulk Rise:** Place in a covered bowl at room temperature (70°F) for 4 hours.
 * **Ball:** Divide into portions and tension into tight balls to trap gas.
 * **Final Proof:** Let balls sit in individual containers for 4 hours at room temperature.
+* **Preheat:** Preheat the oven and baking surface for 1 hour.
 * **Bake:** Stretch and bake once the balls have relaxed and grown slightly in size.
 
 ### 24-Hour - Cold Ferment
@@ -26,6 +27,7 @@ This README provides comprehensive, step-by-step instructions for every fermenta
 * **Kickstart:** Let the dough mass sit at room temperature for 30–60 minutes to wake up the yeast before refrigerating.
 * **Chill:** Place the bulk mass in the fridge for 18–20 hours.
 * **Ball & Temper:** 4 hours before baking, remove from fridge, divide into balls, and let them proof at room temperature.
+* **Preheat:** Preheat the oven and baking surface for 1 hour.
 
 ### 48-Hour - Cold Ferment
 * **Water Temp:** Use cool water (60°F–65°F).
@@ -35,6 +37,7 @@ This README provides comprehensive, step-by-step instructions for every fermenta
 * **Ball:** Immediately divide the dough into balls and place in oiled containers to set the shape before fermenting.
 * **Cold Ferment:** Store in the fridge for 48 hours.
 * **Temper:** Remove from the fridge 3.5 hours before baking; do not stretch until the dough is relaxed.
+* **Preheat:** Preheat the oven and baking surface for 1 hour.
 
 ### 72-Hour - Cold Ferment
 * **Water Temp:** Use cold water (60°F) to prevent over-activity during the long storage.
@@ -44,6 +47,7 @@ This README provides comprehensive, step-by-step instructions for every fermenta
 * **Ball:** Immediately divide into balls and place in the coldest part of the fridge.
 * **Cold Ferment:** Store for 72 hours.
 * **Handle:** Remove 4 hours before baking. Handle extremely gently to avoid popping the fragile air bubbles.
+* **Preheat:** Preheat the oven and baking surface for 1 hour.
 
 ---
 
@@ -58,6 +62,7 @@ This README provides comprehensive, step-by-step instructions for every fermenta
 * **Bulk Rise:** Let the dough double in size at room temperature (approx. 4 hours).
 * **Ball:** Divide and tension into balls.
 * **Final Proof:** Proof at room temperature for 4 hours until the dough is relaxed and gassy.
+* **Preheat:** Preheat the oven and baking surface for 1 hour.
 
 ### 24-Hour - Cold Ferment
 * **Water Temp:** Use room temperature water (65°F).
@@ -67,6 +72,7 @@ This README provides comprehensive, step-by-step instructions for every fermenta
 * **Ball:** Divide and ball immediately after kneading to ensure uniform fermentation in individual containers.
 * **Cold Ferment:** Place in oiled containers and refrigerate for 24 hours.
 * **Temper:** Remove from the fridge 2 hours before baking to allow the gluten to relax.
+* **Preheat:** Preheat the oven and baking surface for 1 hour.
 
 ### 48-Hour - Cold Ferment
 * **Water Temp:** Use cool water (60°F).
@@ -76,6 +82,7 @@ This README provides comprehensive, step-by-step instructions for every fermenta
 * **Ball:** Divide and ball immediately before moving to cold storage.
 * **Cold Ferment:** Store in the fridge for 48 hours for optimal flavor development.
 * **Temper:** Remove 2 hours before baking. If the dough resists stretching, let it rest another 30 minutes.
+* **Preheat:** Preheat the oven and baking surface for 1 hour.
 
 ### 72-Hour - Cold Ferment
 * **Water Temp:** Use cold water (60°F).
@@ -85,6 +92,7 @@ This README provides comprehensive, step-by-step instructions for every fermenta
 * **Ball:** Divide and ball immediately. Ensure containers are well-oiled as the dough becomes more extensible over time.
 * **Cold Ferment:** Store in the fridge for 72 hours.
 * **Temper:** Remove 2 hours before baking. Use plenty of flour on the peel as the dough will be highly delicate.
+* **Preheat:** Preheat the oven and baking surface for 1 hour.
 
 ---
 
