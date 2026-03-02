@@ -1,0 +1,267 @@
+{
+  "processGuide": {
+    "foundation": [
+      {
+        "title": "Autolyse",
+        "body": "Combine flour and water until no dry flour remains, then cover and rest for 20-30 minutes to hydrate the dough."
+      },
+      {
+        "title": "Incorporate Ingredients",
+        "body": "Add yeast and sugar first, then oil if used, and add salt last so it does not directly inhibit yeast activity."
+      },
+      {
+        "title": "Knead",
+        "body": "Knead by hand for about 10 minutes or mixer for 5-7 minutes until smooth, elastic, and able to pass the windowpane test."
+      }
+    ],
+    "fermentationLogic": {
+      "sameDay": [
+        "Use warm water around 90F-95F.",
+        "Plan on 4 hours bulk rise and 4 hours balled proof.",
+        "If the dough gets overly bubbly or flat, bake it immediately."
+      ],
+      "coldFerment": [
+        "Let dough sit at room temp for about 45 minutes before refrigerating.",
+        "Neapolitan dough should come out 3-4 hours before baking.",
+        "New York dough should come out about 2 hours before baking.",
+        "Aim for roughly 65F dough temperature before stretching."
+      ]
+    },
+    "ovenSurfaceNotes": [
+      {
+        "title": "Baking Steel",
+        "body": "Preheat for 1 hour at max temperature for the strongest bottom heat and oven spring."
+      },
+      {
+        "title": "Baking Stone",
+        "body": "Use the middle rack and give the stone about 20 minutes to recover between pizzas."
+      },
+      {
+        "title": "Home Oven Under 525F",
+        "body": "Keep sugar in the dough so the crust browns before it dries out."
+      }
+    ],
+    "troubleshooting": [
+      "Dough will not stretch: it is likely too cold or too tight, so cover it and wait 20 minutes.",
+      "Dough is too sticky: lightly oil your hands instead of continuing to add flour.",
+      "Bottom is soggy: the baking surface likely was not preheated long enough."
+    ]
+  },
+  "doughSizes": [
+    { "value": "10", "label": "10-inch", "weight": 200 },
+    { "value": "12", "label": "12-inch", "weight": 260 },
+    { "value": "14", "label": "14-inch", "weight": 370 },
+    { "value": "16", "label": "16-inch", "weight": 480 },
+    { "value": "custom", "label": "Custom weight", "weight": null }
+  ],
+  "ovenAdjustments": [
+    {
+      "min": 400,
+      "max": 515,
+      "hydrationMod": 3,
+      "forceSugar": true,
+      "sugarLimit": null,
+      "label": "Low-temp home oven",
+      "proTip": "Extended bake times dry out dough; the extra hydration and sugar are essential for a tender, browned crust."
+    },
+    {
+      "min": 516,
+      "max": 650,
+      "hydrationMod": 0,
+      "forceSugar": false,
+      "sugarLimit": null,
+      "label": "Standard pizza range",
+      "proTip": "The sweet spot for NY Style. A baking steel is highly recommended here for maximum 'oven spring'."
+    },
+    {
+      "min": 651,
+      "max": 1000,
+      "hydrationMod": -3,
+      "forceSugar": false,
+      "sugarLimit": 0,
+      "label": "High-heat pizza oven",
+      "proTip": "Sugar will burn instantly at these temps. Keep the dough lean and the hydration lower to avoid a 'gum line'."
+    }
+  ],
+  "styles": {
+    "neapolitan": {
+      "name": "Neapolitan",
+      "tagline": "Airy, soft dough for high-heat ovens.",
+      "oven": "Best for 800F+ (Ooni, Gozney, Wood-fired)",
+      "flourType": "Type 00 Flour (12% protein)",
+      "baseHydration": 62,
+      "salt": 2.5,
+      "oil": 0,
+      "sugar": 0,
+      "fermentationOptions": [
+        {
+          "value": "8h-rt",
+          "label": "8 hours (Same Day)",
+          "durationHours": 8,
+          "yeast": 0.2,
+          "targetWaterTemp": "90F - 95F",
+          "environment": "Room temp (70F)",
+          "instruction": "The 'Direct Method': Mix and knead until the windowpane test is passed. Bulk ferment for 4 hours, ball, and let proof for the final 4 hours at room temp. Use lukewarm water to ensure the yeast 'wakes up' quickly.",
+          "steps": [
+            "Use warm water (90F-95F) to activate yeast quickly.",
+            "Combine flour and water, then rest 20 minutes for autolyse.",
+            "Add IDY yeast and mix thoroughly, then add salt.",
+            "Knead for 8-10 minutes until smooth and the dough passes the windowpane test.",
+            "Bulk rise in a covered bowl at room temperature for 4 hours.",
+            "Divide into portions and tension into tight balls to trap gas.",
+            "Let the balls proof in individual containers for 4 hours at room temperature.",
+            "Stretch and bake once the balls have relaxed and grown slightly."
+          ]
+        },
+        {
+          "value": "24h-cf",
+          "label": "24 hours cold",
+          "durationHours": 24,
+          "yeast": 0.1,
+          "targetWaterTemp": "65F - 70F",
+          "environment": "Cold ferment (38F)",
+          "instruction": "Mix and knead, then let the mass rest at room temperature for 30 minutes to kickstart fermentation before moving to the fridge. Ball the dough at least 6 hours before baking.",
+          "steps": [
+            "Use cool room-temperature water (65F-70F).",
+            "Combine flour and water, then rest 20 minutes.",
+            "Add IDY yeast and mix, then add salt.",
+            "Knead for 8-10 minutes until smooth and elastic.",
+            "Let the dough mass sit at room temperature for 30-60 minutes to kickstart fermentation.",
+            "Place the bulk mass in the fridge for 18-20 hours.",
+            "Remove from the fridge 4 hours before baking, divide into balls, and let them proof at room temperature."
+          ]
+        },
+        {
+          "value": "48h-cf",
+          "label": "48 hours cold",
+          "durationHours": 48,
+          "yeast": 0.03,
+          "targetWaterTemp": "60F - 65F",
+          "environment": "Cold ferment (38F)",
+          "instruction": "Long cold development: Use cool water to keep the dough temperature low during kneading. Pull from the fridge 3 hours before baking to 'temper'—the dough should be 65F internally before stretching.",
+          "steps": [
+            "Use cool water (60F-65F).",
+            "Combine flour and water, then rest 20 minutes.",
+            "Add IDY yeast and mix, then add salt.",
+            "Knead about 10 minutes until the windowpane test is successful.",
+            "Immediately divide the dough into balls and place them in oiled containers.",
+            "Cold ferment in the fridge for 48 hours.",
+            "Remove from the fridge about 3.5 hours before baking and wait until relaxed before stretching."
+          ]
+        },
+        {
+          "value": "72h-cf",
+          "label": "72 hours cold",
+          "durationHours": 72,
+          "yeast": 0.015,
+          "targetWaterTemp": "60F",
+          "environment": "Cold ferment (38F)",
+          "instruction": "Maximum flavor: Enzymes have fully broken down starches into sugars. Handle very gently when balling to avoid degassing the structure. Requires a high-sensitivity scale for yeast measurement.",
+          "steps": [
+            "Use cold water around 60F to prevent over-activity.",
+            "Combine flour and water, then rest 20 minutes.",
+            "Add IDY yeast and mix, then add salt.",
+            "Knead until smooth, but avoid over-kneading.",
+            "Immediately divide into balls and place them in the coldest part of the fridge.",
+            "Cold ferment for 72 hours.",
+            "Remove from the fridge 4 hours before baking and handle very gently to avoid popping air bubbles."
+          ]
+        }
+      ],
+      "workflow": [
+        "Bulk rise as one mass for the first 60% of fermentation.",
+        "Ball into 250g-280g portions with strong surface tension.",
+        "When stretching, push air from the center outward and avoid pressing the rim."
+      ]
+    },
+    "ny": {
+      "name": "New York",
+      "tagline": "Chewy, foldable dough for home ovens.",
+      "oven": "Best for 500-550F (Home oven with Steel/Stone)",
+      "flourType": "High-Protein Bread Flour (12.7% - 14%)",
+      "baseHydration": 65,
+      "salt": 2,
+      "oil": 2,
+      "sugar": 1.5,
+      "fermentationOptions": [
+        {
+          "value": "8h-rt",
+          "label": "8 hours (Same Day)",
+          "durationHours": 8,
+          "yeast": 0.5,
+          "targetWaterTemp": "95F",
+          "environment": "Room temp (70F)",
+          "instruction": "High-activity mix: Sugar and warm water will cause rapid growth. Bulk rise until doubled, ball immediately, and bake once the balls are relaxed and spread slightly.",
+          "steps": [
+            "Use warm water around 95F.",
+            "Combine flour, water, and sugar, then rest 20 minutes.",
+            "Add IDY yeast, then add oil and salt.",
+            "Knead vigorously for 10 minutes to build strong gluten.",
+            "Bulk rise at room temperature until doubled, about 4 hours.",
+            "Divide and tension into balls.",
+            "Final-proof at room temperature for 4 hours until relaxed and gassy."
+          ]
+        },
+        {
+          "value": "24h-cf",
+          "label": "24 hours cold",
+          "durationHours": 24,
+          "yeast": 0.3,
+          "targetWaterTemp": "65F",
+          "environment": "Cold ferment (38F)",
+          "instruction": "Standard NY Deli method: After kneading, ball immediately and place in oiled containers in the fridge. This creates a more uniform crumb structure.",
+          "steps": [
+            "Use room-temperature water around 65F.",
+            "Combine flour, water, and sugar, then rest 20 minutes.",
+            "Add IDY yeast, oil, and salt.",
+            "Knead until very smooth and able to pass the windowpane test.",
+            "Divide and ball immediately after kneading.",
+            "Place in oiled containers and refrigerate for 24 hours.",
+            "Remove from the fridge 2 hours before baking so the gluten can relax."
+          ]
+        },
+        {
+          "value": "48h-cf",
+          "label": "48 hours cold",
+          "durationHours": 48,
+          "yeast": 0.2,
+          "targetWaterTemp": "60F",
+          "environment": "Cold ferment (38F)",
+          "instruction": "The 'Sweet Spot': 48 hours is the ideal balance of gluten relaxation and flavor development. Remove from the fridge 2 hours before stretching. If the dough snaps back, let it rest longer.",
+          "steps": [
+            "Use cool water around 60F.",
+            "Combine flour, water, and sugar, then rest 20 minutes.",
+            "Add IDY yeast, oil, and salt.",
+            "Knead about 10 minutes until tacky but strong.",
+            "Divide and ball immediately before moving to cold storage.",
+            "Cold ferment for 48 hours for optimal flavor development.",
+            "Remove from the fridge 2 hours before baking. If the dough resists stretching, rest another 30 minutes."
+          ]
+        },
+        {
+          "value": "72h-cf",
+          "label": "72 hours cold",
+          "durationHours": 72,
+          "yeast": 0.15,
+          "targetWaterTemp": "60F",
+          "environment": "Cold ferment (38F)",
+          "instruction": "Elite flavor: The dough will be very extensible (stretchy). Use plenty of flour on your peel to prevent sticking. The crust will brown deeply and smell like toasted bread.",
+          "steps": [
+            "Use cold water around 60F.",
+            "Combine flour, water, and sugar, then rest 20 minutes.",
+            "Add IDY yeast, oil, and salt.",
+            "Knead until the surface is silky.",
+            "Divide and ball immediately, using well-oiled containers.",
+            "Cold ferment for 72 hours.",
+            "Remove from the fridge 2 hours before baking and use plenty of flour on the peel."
+          ]
+        }
+      ],
+      "workflow": [
+        "Ball soon after mixing rather than holding a long bulk mass.",
+        "Lightly oil the dough containers.",
+        "Use a knuckle stretch to open the dough thin and wide."
+      ]
+    }
+  }
+}
