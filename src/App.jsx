@@ -1,6 +1,18 @@
 import { useEffect, useState } from 'react';
-import { calculateRecipe, getBallWeight, getOvenAdjustment } from './calculations';
-import { appConfig, doughSizes, ovenAdjustments, recipes } from './recipeData';
+import {
+  calculateRecipe,
+  getBallWeight,
+  getOvenAdjustment,
+  getRoomTempAdjustment,
+} from './calculations';
+import {
+  appConfig,
+  doughSizes,
+  ovenAdjustments,
+  prefermentDefaults,
+  prefermentOptions,
+  recipes,
+} from './recipeData';
 
 const recipeList = Object.values(recipes);
 const DEFAULT_STYLE_ID = 'neapolitan';
@@ -10,9 +22,16 @@ const DEFAULT_CUSTOM_BALL_WEIGHT = 260;
 const DEFAULT_PIZZA_COUNT = 4;
 const OVEN_TEMP_OPTIONS = [450, 500, 700, 900];
 const DEFAULT_OVEN_TEMP = 500;
+const DEFAULT_ROOM_TEMP = 70;
+const DEFAULT_PREFERMENT_TYPE = 'standard';
 
 function formatGrams(value, decimals = 1) {
   return `${Number(value).toFixed(decimals)} g`;
+}
+
+function roundTo(value, decimals = 1) {
+  const factor = 10 ** decimals;
+  return Math.round(value * factor) / factor;
 }
 
 function formatDuration(duration, unit) {
@@ -24,18 +43,57 @@ function formatDuration(duration, unit) {
   return `${duration} ${label}`;
 }
 
-function getWaterTempLabel(timeline) {
-  const firstDetail = timeline
-    .flatMap((phase) => phase.steps)
-    .find((step) => step.detail?.toLowerCase().includes('water'))
-    ?.detail;
-
-  if (!firstDetail) {
-    return 'Follow selected recipe';
+function rewriteStepDetailForPreferment(detail) {
+  if (!detail) {
+    return detail;
   }
 
-  const match = firstDetail.match(/\(([^)]+)\)/);
-  return match ? match[1] : firstDetail;
+  return detail
+    .replace(/Add IDY yeast and mix, then add salt\./i, 'Add the poolish and mix, then add salt.')
+    .replace(/Add IDY and salt\./i, 'Add the poolish, then add salt.')
+    .replace(/Add IDY, then oil and salt\./i, 'Add the poolish, then oil and salt.')
+    .replace(/Add IDY, oil, and salt\./i, 'Add the poolish, oil, and salt.');
+}
+
+function buildPrefermentMix(calculation, recipe) {
+  const flour = roundTo(calculation.ingredientWeights.flour * prefermentDefaults.flourRatio);
+  const water = roundTo(flour * (prefermentDefaults.hydration / 100));
+  const yeast = calculation.ingredientWeights.yeast;
+
+  return {
+    label: prefermentDefaults.label,
+    items: [
+      { label: recipe.flourLabel, value: flour, percent: null, decimals: 1 },
+      { label: 'Water', value: water, percent: null, decimals: 1 },
+      { label: 'Instant Dry Yeast', value: yeast, percent: null, decimals: 2 },
+    ],
+  };
+}
+
+function buildMainMix(calculation, recipe, prefermentMix) {
+  const prefermentFlour = prefermentMix.items.find((item) => item.label === recipe.flourLabel)?.value || 0;
+  const prefermentWater = prefermentMix.items.find((item) => item.label === 'Water')?.value || 0;
+
+  return {
+    label: 'Main Mix',
+    items: [
+      {
+        label: recipe.flourLabel,
+        value: roundTo(calculation.ingredientWeights.flour - prefermentFlour),
+        percent: null,
+        decimals: 1,
+      },
+      {
+        label: 'Water',
+        value: roundTo(calculation.ingredientWeights.water - prefermentWater),
+        percent: null,
+        decimals: 1,
+      },
+      { label: 'Salt', value: calculation.ingredientWeights.salt, percent: null, decimals: 1 },
+      { label: 'Olive Oil', value: calculation.ingredientWeights.oil, percent: null, decimals: 1 },
+      { label: 'Sugar', value: calculation.ingredientWeights.sugar, percent: null, decimals: 1 },
+    ].filter((item) => item.value > 0),
+  };
 }
 
 function parseInitialState() {
@@ -47,6 +105,13 @@ function parseInitialState() {
   const sizeValue = params.get('size');
   const validSizes = doughSizes.map((option) => option.value);
   const parsedOvenTemp = Number(params.get('ovenTemp'));
+  const prefermentEnabled = params.get('preferment') === '1';
+  const roomTempParam = params.get('roomTemp');
+  const parsedRoomTemp = roomTempParam === null ? NaN : Number(roomTempParam);
+  const requestedPrefermentType = params.get('prefermentType');
+  const prefermentType = prefermentOptions.some((option) => option.id === requestedPrefermentType)
+    ? requestedPrefermentType
+    : DEFAULT_PREFERMENT_TYPE;
 
   return {
     styleId: validStyleId,
@@ -59,6 +124,9 @@ function parseInitialState() {
     customBallWeight: Number(params.get('customBallWeight')) || DEFAULT_CUSTOM_BALL_WEIGHT,
     pizzaCount: Number(params.get('count')) || DEFAULT_PIZZA_COUNT,
     ovenTemp: OVEN_TEMP_OPTIONS.includes(parsedOvenTemp) ? parsedOvenTemp : DEFAULT_OVEN_TEMP,
+    prefermentEnabled,
+    roomTemp: Number.isFinite(parsedRoomTemp) ? parsedRoomTemp : DEFAULT_ROOM_TEMP,
+    prefermentType,
   };
 }
 
@@ -70,15 +138,20 @@ function App() {
   const [customBallWeight, setCustomBallWeight] = useState(initialState.customBallWeight);
   const [pizzaCount, setPizzaCount] = useState(initialState.pizzaCount);
   const [ovenTemp, setOvenTemp] = useState(initialState.ovenTemp);
+  const [prefermentEnabled, setPrefermentEnabled] = useState(initialState.prefermentEnabled);
+  const [roomTemp, setRoomTemp] = useState(initialState.roomTemp);
+  const [prefermentType, setPrefermentType] = useState(initialState.prefermentType);
 
   const recipe = recipes[styleId];
   const fermentationOptions = recipe.fermentationOptions;
   const fermentation =
     fermentationOptions.find((option) => option.value === fermentationValue) ||
     fermentationOptions[0];
-  const waterTempLabel = getWaterTempLabel(fermentation.timeline);
+  const selectedPrefermentOption =
+    prefermentOptions.find((option) => option.id === prefermentType) || prefermentOptions[0];
   const sizeOption =
     doughSizes.find((option) => option.value === sizeValue) || doughSizes[1];
+  const roomTempAdjustment = getRoomTempAdjustment(fermentation, roomTemp);
 
   const ballWeight = getBallWeight(sizeOption, customBallWeight);
   const ovenAdjustment = getOvenAdjustment(ovenTemp, ovenAdjustments);
@@ -86,9 +159,15 @@ function App() {
   const hydrationPercent = recipe.ingredients.water + (ovenAdjustment?.hydrationMod || 0);
   const targetDoughWeight =
     (Number(pizzaCount) || 0) * ballWeight * (appConfig?.wasteFactor || 1);
+  const effectiveFermentation = prefermentEnabled
+    ? {
+        ...fermentation,
+        yeast: roomTempAdjustment.adjustedYeast * selectedPrefermentOption.yeastMod,
+      }
+    : { ...fermentation, yeast: roomTempAdjustment.adjustedYeast };
   const calculation = calculateRecipe(
     recipe,
-    fermentation,
+    effectiveFermentation,
     'idy',
     1,
     targetDoughWeight,
@@ -133,6 +212,8 @@ function App() {
       decimals: 2,
     },
   ].filter((row) => row.percent > 0);
+  const prefermentMix = prefermentEnabled ? buildPrefermentMix(calculation, recipe) : null;
+  const mainMix = prefermentEnabled ? buildMainMix(calculation, recipe, prefermentMix) : null;
 
   const warnings = [];
   if (styleId === 'neapolitan' && fermentation.value === '72h-cf') {
@@ -158,6 +239,12 @@ function App() {
     );
   }
 
+  if (prefermentEnabled && fermentation.value !== '8h-rt' && fermentation.value !== '24h-cf') {
+    warnings.push(
+      'Poolish is most useful for same-day dough. On longer cold ferments it can push the dough toward over-fermentation.',
+    );
+  }
+
   const handleStyleChange = (nextStyleId) => {
     const nextRecipe = recipes[nextStyleId];
     setStyleId(nextStyleId);
@@ -175,7 +262,9 @@ function App() {
       const detailParts = [];
 
       if (step.detail) {
-        detailParts.push(step.detail);
+        detailParts.push(
+          prefermentEnabled ? rewriteStepDetailForPreferment(step.detail) : step.detail,
+        );
       }
 
       if (step.temp) {
@@ -203,6 +292,32 @@ function App() {
     return [phaseHeader, ...steps];
   });
 
+  if (prefermentEnabled) {
+    timelineItems.unshift(
+      {
+        id: 'preferment-phase',
+        kind: 'phase',
+        phase: 'Preferment',
+      },
+      {
+        id: 'preferment-mix',
+        kind: 'step',
+        stepType: 'action',
+        label: `Mix ${prefermentDefaults.label}`,
+        detail: `${formatGrams(prefermentMix.items[0].value)} ${recipe.flourLabel}, ${formatGrams(prefermentMix.items[1].value)} water, and ${formatGrams(prefermentMix.items[2].value, 2)} instant dry yeast.`,
+        durationLabel: null,
+      },
+      {
+        id: 'preferment-wait',
+        kind: 'step',
+        stepType: 'wait',
+        label: 'Ferment Preferment',
+        detail: `${selectedPrefermentOption.detail} Water temp: ${selectedPrefermentOption.waterTemp}.`,
+        durationLabel: selectedPrefermentOption.duration,
+      },
+    );
+  }
+
   if (ovenAdjustment?.proTip) {
     timelineItems.push({
       id: 'oven-note',
@@ -221,6 +336,11 @@ function App() {
     params.set('size', sizeValue);
     params.set('count', String(pizzaCount));
     params.set('ovenTemp', String(ovenTemp));
+    params.set('roomTemp', String(roomTemp));
+    if (prefermentEnabled) {
+      params.set('preferment', '1');
+      params.set('prefermentType', prefermentType);
+    }
 
     if (sizeValue === 'custom') {
       params.set('customBallWeight', String(customBallWeight));
@@ -233,6 +353,9 @@ function App() {
     fermentationValue,
     ovenTemp,
     pizzaCount,
+    prefermentEnabled,
+    prefermentType,
+    roomTemp,
     sizeValue,
     styleId,
   ]);
@@ -262,130 +385,209 @@ function App() {
 
       <section className="section">
         <h2>Inputs</h2>
-        <div className="controls">
-          <label>
-            <span>Fermentation</span>
-            <select
-              value={fermentation.value}
-              onChange={(event) => setFermentationValue(event.target.value)}
-            >
-              {fermentationOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label} - {option.environment}
-                </option>
-              ))}
-            </select>
-          </label>
+        <div className="control-groups">
+          <div className="control-group">
+            <h3>Method</h3>
+            <div className="controls">
+              <label>
+                <span className="field-label">Fermentation</span>
+                <select
+                  value={fermentation.value}
+                  onChange={(event) => setFermentationValue(event.target.value)}
+                >
+                  {fermentationOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label} - {option.environment}
+                    </option>
+                  ))}
+                </select>
+              </label>
 
-          <label>
-            <span>Oven Temp (F): {ovenTemp}</span>
-            <input
-              type="range"
-              min="0"
-              max={String(OVEN_TEMP_OPTIONS.length - 1)}
-              step="1"
-              value={ovenTempIndex}
-              onChange={(event) => setOvenTemp(OVEN_TEMP_OPTIONS[Number(event.target.value)])}
-            />
-            <div className="range-labels">
-              {OVEN_TEMP_OPTIONS.map((temp) => (
-                <span key={temp}>{temp}</span>
-              ))}
+              <label className="toggle-field">
+                <span className="field-label">Preferment</span>
+                <button
+                  type="button"
+                  className={`switch ${prefermentEnabled ? 'on' : ''}`}
+                  aria-pressed={prefermentEnabled}
+                  onClick={() => setPrefermentEnabled((value) => !value)}
+                >
+                  <span className="switch-track">
+                    <span className="switch-thumb" />
+                  </span>
+                  <span className="switch-copy">Use poolish preferment</span>
+                </button>
+              </label>
+
+              {prefermentEnabled ? (
+                <label className="control-full">
+                  <span className="field-label">Poolish Type</span>
+                  <select
+                    value={prefermentType}
+                    onChange={(event) => setPrefermentType(event.target.value)}
+                  >
+                    {prefermentOptions.map((option) => (
+                      <option key={option.id} value={option.id}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="control-help">
+                    {selectedPrefermentOption.duration} at {selectedPrefermentOption.waterTemp}.{' '}
+                    {selectedPrefermentOption.id === 'fast'
+                      ? 'Fast same-day boost.'
+                      : 'Best flavor overnight.'}
+                  </p>
+                </label>
+              ) : null}
             </div>
-          </label>
+          </div>
 
-          <label>
-            <span>Dough Ball Size</span>
-            <select
-              value={sizeValue}
-              onChange={(event) => setSizeValue(event.target.value)}
-            >
-              {doughSizes.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                  {option.weight ? ` (${option.weight}g)` : ''}
-                </option>
-              ))}
-            </select>
-          </label>
+          <div className="control-group">
+            <h3>Temperature</h3>
+            <div className="controls">
+              <label className={fermentation.environment !== 'Room temp' ? 'field-disabled' : ''}>
+                <span className="field-label">
+                  Room Temp (F): {roomTemp}
+                  {fermentation.environment !== 'Room temp'
+                    ? ' (disabled for cold ferment)'
+                    : ''}
+                </span>
+                <input
+                  type="range"
+                  min="60"
+                  max="85"
+                  step="1"
+                  value={roomTemp}
+                  disabled={fermentation.environment !== 'Room temp'}
+                  onChange={(event) => setRoomTemp(Number(event.target.value))}
+                />
+                {fermentation.environment !== 'Room temp' ? (
+                  <p className="control-help">Used only for room-temp fermentation schedules.</p>
+                ) : null}
+              </label>
 
-          <label>
-            <span>Pizza Count: {pizzaCount}</span>
-            <input
-              type="range"
-              min="1"
-              max="12"
-              step="1"
-              value={pizzaCount}
-              onChange={(event) => setPizzaCount(Number(event.target.value))}
-            />
-          </label>
+              <label>
+                <span className="field-label">Oven Temp (F): {ovenTemp}</span>
+                <input
+                  type="range"
+                  min="0"
+                  max={String(OVEN_TEMP_OPTIONS.length - 1)}
+                  step="1"
+                  value={ovenTempIndex}
+                  onChange={(event) => setOvenTemp(OVEN_TEMP_OPTIONS[Number(event.target.value)])}
+                />
+                <div className="range-labels">
+                  {OVEN_TEMP_OPTIONS.map((temp) => (
+                    <span key={temp}>{temp}</span>
+                  ))}
+                </div>
+              </label>
+            </div>
+          </div>
 
-          {sizeValue === 'custom' ? (
-            <label>
-              <span>Custom Ball Weight (g)</span>
-              <input
-                type="number"
-                min="1"
-                value={customBallWeight}
-                onChange={(event) => setCustomBallWeight(event.target.value)}
-              />
-            </label>
-          ) : null}
+          <div className="control-group">
+            <h3>Batch Size</h3>
+            <div className="controls">
+              <label>
+                <span className="field-label">Dough Ball Size</span>
+                <select
+                  value={sizeValue}
+                  onChange={(event) => setSizeValue(event.target.value)}
+                >
+                  {doughSizes.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                      {option.weight ? ` (${option.weight}g)` : ''}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label>
+                <span className="field-label">Pizza Count: {pizzaCount}</span>
+                <input
+                  type="range"
+                  min="1"
+                  max="12"
+                  step="1"
+                  value={pizzaCount}
+                  onChange={(event) => setPizzaCount(Number(event.target.value))}
+                />
+              </label>
+
+              {sizeValue === 'custom' ? (
+                <label className="control-full">
+                  <span className="field-label">Custom Ball Weight (g)</span>
+                  <input
+                    type="number"
+                    min="1"
+                    value={customBallWeight}
+                    onChange={(event) => setCustomBallWeight(event.target.value)}
+                  />
+                </label>
+              ) : null}
+            </div>
+          </div>
+        </div>
+        <div className="input-footer">
+          <div className="inline-chips">
+            <div className="inline-chip">
+              <span>Ball Weight</span>
+              <strong>{formatGrams(ballWeight)}</strong>
+            </div>
+            <div className="inline-chip">
+              <span>Total Dough</span>
+              <strong>{formatGrams((Number(pizzaCount) || 0) * ballWeight)}</strong>
+            </div>
+            {prefermentEnabled ? (
+              <div className="inline-chip">
+                <span>Poolish</span>
+                <strong>{selectedPrefermentOption.label}</strong>
+              </div>
+            ) : null}
+          </div>
+          <a className="jump-link" href="#calculated-recipe">
+            Jump to Recipe
+          </a>
         </div>
       </section>
 
-      <section className="section">
-        <h2>Summary</h2>
-        <div className="summary-list">
-          <div className="summary-row">
-            <span>Style</span>
-            <strong>{recipe.name}</strong>
-          </div>
-          <div className="summary-row">
-            <span>Environment</span>
-            <strong>{fermentation.environment}</strong>
-          </div>
-          <div className="summary-row">
-            <span>Oven Temp</span>
-            <strong>{ovenTemp}F</strong>
-          </div>
-          <div className="summary-row">
-            <span>Water Temp</span>
-            <strong>{waterTempLabel}</strong>
-          </div>
-          <div className="summary-row">
-            <span>Ball Weight</span>
-            <strong>{formatGrams(ballWeight)}</strong>
-          </div>
-          <div className="summary-row">
-            <span>Total Dough</span>
-            <strong>{formatGrams(calculation.totalDoughWeight)}</strong>
-          </div>
-        </div>
-        {ovenAdjustment ? (
-          <p className="summary-note">
-            {ovenAdjustment.label}. Hydration is adjusted in the calculated recipe below.
-          </p>
-        ) : null}
-      </section>
-
-      <section className="section">
+      <section className="section" id="calculated-recipe">
         <h2>Calculated Recipe</h2>
         <p className="summary-note">
           These are the actual ingredient weights for this dough setup.
         </p>
-        <div className="ingredient-table">
-          {ingredientRows.map((row) => (
-            <div key={row.label} className="ingredient-row">
-              <div>
-                <span className="ingredient-label">{row.label}</span>
-                <span className="ingredient-percent">{row.percent}% baker&apos;s %</span>
+        {prefermentEnabled ? (
+          <div className="recipe-split">
+            {[prefermentMix, mainMix].map((mix) => (
+              <div key={mix.label} className="recipe-card">
+                <h3>{mix.label}</h3>
+                <div className="ingredient-table">
+                  {mix.items.map((row) => (
+                    <div key={row.label} className="ingredient-row">
+                      <div>
+                        <span className="ingredient-label">{row.label}</span>
+                      </div>
+                      <strong>{formatGrams(row.value, row.decimals)}</strong>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <strong>{formatGrams(row.value, row.decimals)}</strong>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="ingredient-table">
+            {ingredientRows.map((row) => (
+              <div key={row.label} className="ingredient-row">
+                <div>
+                  <span className="ingredient-label">{row.label}</span>
+                  <span className="ingredient-percent">{row.percent}%</span>
+                </div>
+                <strong>{formatGrams(row.value, row.decimals)}</strong>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="section">

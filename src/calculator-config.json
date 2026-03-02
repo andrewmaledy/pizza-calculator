@@ -4,6 +4,30 @@
     "defaultYeastType": "IDY",
     "precision": 1
   },
+  "prefermentDefaults": {
+    "flourRatio": 0.33,
+    "hydration": 100,
+    "label": "Poolish",
+    "proTip": "Mix ahead until bubbly and slightly sweet and nutty."
+  },
+  "prefermentOptions": [
+    {
+      "id": "standard",
+      "label": "Standard (Overnight)",
+      "duration": "12-24 hours",
+      "yeastMod": 0.08,
+      "waterTemp": "70F",
+      "detail": "Maximum flavor development. Mix the night before."
+    },
+    {
+      "id": "fast",
+      "label": "Express (Same Day)",
+      "duration": "3-5 hours",
+      "yeastMod": 0.25,
+      "waterTemp": "85F",
+      "detail": "Quick hit of acidity and strength. Use warm water and keep in a warm spot."
+    }
+  ],
   "doughSizes": [
     { "value": "10", "label": "10-inch", "weight": 200 },
     { "value": "12", "label": "12-inch", "weight": 260 },
@@ -33,6 +57,7 @@
         {
           "value": "8h-rt",
           "label": "8 hours (Same Day)",
+          "yeast": 0.2,
           "timeline": [
             {
               "phase": "Mixing",
@@ -63,6 +88,7 @@
         {
           "value": "24h-cf",
           "label": "24 hours cold",
+          "yeast": 0.1,
           "timeline": [
             {
               "phase": "Mixing",
@@ -92,6 +118,7 @@
         {
           "value": "48h-cf",
           "label": "48 hours cold",
+          "yeast": 0.03,
           "timeline": [
             {
               "phase": "Mixing",
@@ -121,6 +148,7 @@
         {
           "value": "72h-cf",
           "label": "72 hours cold",
+          "yeast": 0.015,
           "timeline": [
             {
               "phase": "Mixing",
@@ -155,6 +183,7 @@
         {
           "value": "8h-rt",
           "label": "8 hours (Same Day)",
+          "yeast": 0.5,
           "timeline": [
             {
               "phase": "Mixing",
@@ -184,6 +213,7 @@
         {
           "value": "24h-cf",
           "label": "24 hours cold",
+          "yeast": 0.3,
           "timeline": [
             {
               "phase": "Mixing",
@@ -212,6 +242,7 @@
         {
           "value": "48h-cf",
           "label": "48 hours cold",
+          "yeast": 0.2,
           "timeline": [
             {
               "phase": "Mixing",
@@ -240,6 +271,7 @@
         {
           "value": "72h-cf",
           "label": "72 hours cold",
+          "yeast": 0.15,
           "timeline": [
             {
               "phase": "Mixing",

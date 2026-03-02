@@ -1,6 +1,37 @@
 const roundToTenth = (value) => Math.round(value * 10) / 10;
 const roundToHundredth = (value) => Math.round(value * 100) / 100;
 
+export function getRoomTempAdjustment(fermentation, roomTemp) {
+  const parsedRoomTemp = Number(roomTemp);
+  const baselineYeast = fermentation.yeast;
+
+  if (fermentation.environment !== 'Room temp' || !Number.isFinite(parsedRoomTemp)) {
+    return {
+      adjustedYeast: baselineYeast,
+      suggestedWaterTemp: null,
+      isAdjusted: false,
+    };
+  }
+
+  const scaledYeast =
+    baselineYeast * (1 - (((parsedRoomTemp - 70) / 5) * 0.10));
+  const minYeast = fermentation.value === '8h-rt' ? 0.05 : 0;
+  const adjustedYeast = Math.max(minYeast, scaledYeast);
+
+  let suggestedWaterTemp = '90F - 95F';
+  if (parsedRoomTemp < 65) {
+    suggestedWaterTemp = '100F - 105F';
+  } else if (parsedRoomTemp > 75) {
+    suggestedWaterTemp = '75F - 80F';
+  }
+
+  return {
+    adjustedYeast: roundToHundredth(adjustedYeast),
+    suggestedWaterTemp,
+    isAdjusted: true,
+  };
+}
+
 export function getBallWeight(sizeOption, customBallWeight) {
   if (sizeOption.weight) {
     return sizeOption.weight;
